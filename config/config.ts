@@ -131,7 +131,7 @@ export default {
             },
             {
               name: 'Create slice',
-              icon: 'smile',
+              icon: 'AppstoreAddOutlined',
               path: '/slices/create',
               component: './Slices/Create',
             },
@@ -143,10 +143,10 @@ export default {
               authority: ['admin'],
             },
             {
-              name: 'list.table-list',
-              icon: 'table',
-              path: '/list',
-              component: './ListTableList',
+              name: 'Program',
+              icon: 'SettingOutlined',
+              path: '/program',
+              component: './Program',
             },
             {
               component: './404',

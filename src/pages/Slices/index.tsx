@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Spin } from 'antd';
 import styles from './index.less';
 import Topology from '../../components/Topology';
-
+import TableBasic from './TableBasic';
 export default () => {
   const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
@@ -13,10 +13,8 @@ export default () => {
   }, []);
   return (
     <PageHeaderWrapper className={styles.main}>
-      <div style={{ paddingTop: 100, textAlign: 'center' }}>
-        <Topology/>
-        <Spin spinning={loading} size="large" />
-      </div>
+      <TableBasic />
+      
     </PageHeaderWrapper>
   );
 };

@@ -89,10 +89,10 @@ const Step2: React.FC<Step2Props> = props => {
         }}
       >
         <Button type="primary" onClick={onValidateForm} loading={submitting}>
-          提交
+          Submit
         </Button>
         <Button onClick={onPrev} style={{ marginLeft: 8 }}>
-          上一步
+          Prev
         </Button>
       </Form.Item>
     </Form>

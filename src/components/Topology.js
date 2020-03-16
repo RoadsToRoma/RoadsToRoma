@@ -5,6 +5,7 @@ import { Button, Card, Collapse, Drawer, Icon, List, Tag, Timeline, Tooltip,Divi
 
 const Panel = Collapse.Panel;
 class Topology extends Component {
+    
     state = {
         visible: false,
         currentNode: {}
@@ -22,13 +23,13 @@ class Topology extends Component {
             },
             elements: [
                 {
-                    data: { id: 'SG', label: '韶关' }, position: { x: -500, y: 0 }
+                    data: { id: 'SG', label: 'ShaoGuan' }, position: { x: -500, y: 0 }
                 },
                 {
-                    data: { id: 'SZ', label: '深圳' }, position: { x: -250, y: 40 }
+                    data: { id: 'SZ', label: 'ShengZhen' }, position: { x: -250, y: 40 }
                 },
                 {
-                    data: { id: 'GZ', label: '广州' }, position: { x: 200, y: 20 }
+                    data: { id: 'GZ', label: 'GuangZhou' }, position: { x: 200, y: 20 }
                 },
                 {
                     data: { id: 'HY' }, position: { x: -540, y: 200 }
@@ -95,6 +96,7 @@ class Topology extends Component {
             var pos = cy.$id(n).position()
             for (let i = 0; i < 2; i++) {
                 cy.add({ data: { id: n + ':' + i, parent: n }, position: { x: i * 40 + pos.x, y: pos.y } })
+                cy.add({ data: { id: n + ':' + (i + 2), parent: n }, position: { x: i * 40 + pos.x, y: pos.y + 50 } })
             }
         })
         // add links
@@ -128,20 +130,13 @@ class Topology extends Component {
                 { data: { id: l.id, source: l.source, target: l.target } }
             ])
         })
-
-        cy.edges().on('select', e => {
-            let l = e.target
-            cy.$id(l.id()).source().select()
-            cy.$id(l.id()).target().select()
-            // cy.$(':selected').forEach(e => {
-            //     console.log(e)
-            // })
+        cy.nodes().on('select', e => {
+            let n = e.target
+            n.neighborhood().select()
             let cys = cytoscape({
-
                 container: document.getElementById('cys'), // container to render in
                 layout: {
                     name: 'preset',
-                    // rows: 2,
                 },
                 elements: cy.filter(e => {
                     if (e.isNode() && !e.data('parent')) {
@@ -164,9 +159,50 @@ class Topology extends Component {
                     }
                 ],
             })
-            // console.log(cy.selected())
-            // console.log(l.source().selected())
         })
+
+        // cy.elements().on('select', e => {
+        //     if (this.props.showSlice === false) {
+        //         return
+        //     }
+        //     let l = e.target
+        //     if (1) {
+        //     cy.$id(l.id()).source().select()
+        //     cy.$id(l.id()).target().select()
+        //     }
+        //     // cy.$(':selected').forEach(e => {
+        //     //     console.log(e)
+        //     // })
+        //     let cys = cytoscape({
+
+        //         container: document.getElementById('cys'), // container to render in
+        //         layout: {
+        //             name: 'preset',
+        //         },
+        //         elements: cy.filter(e => {
+        //             if (e.isNode() && !e.data('parent')) {
+        //                 if (cy.filter(ee => ee.data('parent') == e.id() && ee.selected()).length > 0) {
+        //                     return true
+        //                 } else {
+        //                     return false
+        //                 }
+        //             }
+        //             return e.selected()
+        //         }).jsons(),
+        //         style: [
+        //             {
+        //                 selector: 'node',
+        //                 style: {
+        //                     'label': function (ele) {
+        //                         return ele.data('label') ? ele.data('label') : ele.data('id')
+        //                     }
+        //                 }
+        //             }
+        //         ],
+        //     })
+        //     // console.log(cy.selected())
+        //     // console.log(l.source().selected())
+        // })
 
         cy.fit()
 
@@ -198,6 +234,7 @@ class Topology extends Component {
     };
 
     render() {
+        const {showSlice} = this.props
         const data = [
             'BGP',
             'Fireware',
@@ -205,62 +242,20 @@ class Topology extends Component {
         ];
         return (
             <div style={{ width: '100%', display: 'block' }}>
-                <div id='cy' style={{ width: '100%', display: 'block' }} ref="cyelement">
+                <div id='cy' style={{ width: '100%', height: '400px', display: 'block' }} ref="cyelement">
 
                 </div>
                 <Divider style={{ margin: '10px 0' }} />
-                Slice topology:
-                <div id='cys' style={{ width: '100%', height: 400, display: 'block' }} ref="cyelement">
+                {showSlice !== false?
+                    <div>
+                        Slice topology:
+                        <div id='cys' style={{ width: '100%', height: 400, display: 'block' }} ref="cyelement">
 
-                </div>
-                <Drawer
-                    title={"Node inspect: " + this.state.currentNode.id}
-                    placement="right"
-                    onClose={this.onClose}
-                    closable={true}
-                    mask={false}
-                    width={400}
-                    visible={this.state.visible}
-                >
-                    <div style={{ overflow: 'auto' }}>
-                        {this.state.currentNode.label}
-                        <Card
-                            size="small"
-                            title="Labels"
-                            extra={<Tooltip title="Add label"><Icon type="plus" /></Tooltip>}
-                            style={{ marginBottom: 30 }}
-                        >
-                            <Tag color="#108ee9">Core</Tag>
-                            <Tag color="#108ee9">100G</Tag>
-                        </Card>
-                        <Collapse defaultActiveKey={['1']}>
-                            <Panel header="Installed Applications" key="1">
-                                <List
-                                    dataSource={data}
-                                    renderItem={item => (<List.Item>{item}</List.Item>)}
-                                />
-                            </Panel>
-                            <Panel header="Events" key="2">
-                                <Timeline>
-                                    <Timeline.Item color="green">
-                                        <p>[2019-10-11 8:32:31]</p>
-                                        <p>Port up</p>
-                                    </Timeline.Item>
-                                    <Timeline.Item color="red">
-                                        <p>[2019-10-11 8:32:31]</p>
-                                        <p>Link failure detected</p>
-                                    </Timeline.Item>
-                                    <Timeline.Item color="green">
-                                        <p>[2019-10-10 8:32:31]</p>
-                                        <p>Node joined</p>
-                                    </Timeline.Item>
-                                </Timeline>
-                            </Panel>
-                        </Collapse>
-                        {/*<Link to={'/applications/create'}><Button type={'primary'} style={{marginTop: 30}}><Icon*/}
-                        {/*type="code"/> Program</Button></Link>*/}
-                    </div>
-                </Drawer>
+                        </div>
+                    </div>:
+                        null
+                }
+                
             </div>
         )
     }
